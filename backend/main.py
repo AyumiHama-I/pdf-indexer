@@ -3,6 +3,7 @@ from fastapi import FastAPI, UploadFile, File
 from typing import List
 import shutil
 import os
+from extractor import extract_date, extract_amount, extract_tel
 
 app = FastAPI()
 
@@ -24,12 +25,17 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
             for page in pdf.pages:
                 text += page.extract_text() or ""
 
+        # 抽出したテキストから日付・金額・電話番号を取得
+        date = extract_date(text)
+        amount = extract_amount(text)
+        tel = extract_tel(text)
+
         results.append({
             "original_name": file.filename,
-            "date": None,
-            "company": None,
-            "amount": None,
-            "extracted_text": text  # 確認用、後で消す
+            "date": date,
+            "company": None,  # 次のステップで埋める
+            "amount": amount,
+            "tel": tel,       # 確認用、master.csv照合後に消す
         })
 
     return results
