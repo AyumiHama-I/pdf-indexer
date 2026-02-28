@@ -36,8 +36,8 @@ def extract_amount(text: str) -> str:
     return None
 
 def extract_tel(text: str) -> str:
-    # 例: 03-1234-5678, 0120-123-456
-    pattern = r'(\d{2,4}-\d{2,4}-\d{4})'
+    # ハイフン区切りの電話番号全般に対応
+    pattern = r'(\d{2,4}-\d{2,4}-\d{3,4})'
     match = re.search(pattern, text)
     if match:
         return match.group(1)
