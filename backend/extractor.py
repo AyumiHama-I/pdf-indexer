@@ -1,6 +1,6 @@
 import re
 
-def extract_date(text: str) -> str | None:
+def extract_date(text: str) -> str:
     # 例: 2026/02/01, 2026-02-01, 2026年02月01日, 令和8年2月1日
     patterns = [
         r'(\d{4})[/\-年](\d{1,2})[/\-月](\d{1,2})',
@@ -21,7 +21,7 @@ def extract_date(text: str) -> str | None:
             return f"{year}{month}{day}"
     return None
 
-def extract_amount(text: str) -> str | None:
+def extract_amount(text: str) -> str:
     # 例: ¥110,000, 110,000円, 合計 110,000
     patterns = [
         r'[¥￥](\d{1,3}(?:,\d{3})+)',
@@ -35,7 +35,7 @@ def extract_amount(text: str) -> str | None:
             return match.group(1).replace(",", "")
     return None
 
-def extract_tel(text: str) -> str | None:
+def extract_tel(text: str) -> str:
     # 例: 03-1234-5678, 0120-123-456
     pattern = r'(\d{2,4}-\d{2,4}-\d{4})'
     match = re.search(pattern, text)
