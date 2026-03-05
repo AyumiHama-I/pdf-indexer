@@ -6,6 +6,14 @@ import os
 from extractor import extract_date, extract_amount, extract_tel
 from matcher import load_master, find_company_by_tel
 from fastapi.responses import FileResponse
+from builder import build_zip_and_csv
+from pydantic import BaseModel
+
+class ConfirmedItem(BaseModel):
+    original_name: str
+    date: str
+    company: str
+    amount: str
 
 app = FastAPI()
 
@@ -13,6 +21,15 @@ TMP_DIR = "tmp"
 
 # 起動時にmaster.csvを読み込む
 master = load_master()
+
+@app.post("/confirm")
+async def confirm(items: List[ConfirmedItem]):
+    confirmed_list = [item.dict() for item in items]
+    zip_path, csv_path = build_zip_and_csv(confirmed_list)
+    return {
+        "zip_url": "/download/result.zip",
+        "csv_url": "/download/result.csv",
+    }
 
 @app.get("/preview/{filename}")
 async def preview_pdf(filename: str):
