@@ -5,6 +5,7 @@ import shutil
 import os
 from extractor import extract_date, extract_amount, extract_tel
 from matcher import load_master, find_company_by_tel
+from fastapi.responses import FileResponse
 
 app = FastAPI()
 
@@ -12,6 +13,11 @@ TMP_DIR = "tmp"
 
 # 起動時にmaster.csvを読み込む
 master = load_master()
+
+@app.get("/preview/{filename}")
+async def preview_pdf(filename: str):
+    tmp_path = os.path.join(TMP_DIR, filename)
+    return FileResponse(tmp_path, media_type="application/pdf")
 
 @app.post("/upload")
 async def upload_pdfs(files: List[UploadFile] = File(...)):
