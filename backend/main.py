@@ -22,6 +22,28 @@ TMP_DIR = "tmp"
 # 起動時にmaster.csvを読み込む
 master = load_master()
 
+@app.get("/download/{filename}")
+async def download_file(filename: str):
+    file_path = os.path.join(TMP_DIR, filename)
+    
+    # ファイルが存在するか確認
+    if not os.path.exists(file_path):
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="ファイルが見つかりません")
+    
+    # BackgroundTaskで「レスポンスを返した後に」tmp/を削除する
+    from starlette.background import BackgroundTask
+    
+    def cleanup():
+        for f in os.listdir(TMP_DIR):
+            os.remove(os.path.join(TMP_DIR, f))
+    
+    return FileResponse(
+        file_path,
+        filename=filename,
+        background=BackgroundTask(cleanup)
+    )
+    
 @app.post("/confirm")
 async def confirm(items: List[ConfirmedItem]):
     confirmed_list = [item.dict() for item in items]
