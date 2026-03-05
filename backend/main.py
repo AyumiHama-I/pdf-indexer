@@ -8,6 +8,7 @@ from matcher import load_master, find_company_by_tel
 from fastapi.responses import FileResponse
 from builder import build_zip_and_csv
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
 class ConfirmedItem(BaseModel):
     original_name: str
@@ -16,6 +17,14 @@ class ConfirmedItem(BaseModel):
     amount: str
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 TMP_DIR = "tmp"
 
