@@ -4,10 +4,14 @@ from typing import List
 import shutil
 import os
 from extractor import extract_date, extract_amount, extract_tel
+from matcher import load_master, find_company_by_tel
 
 app = FastAPI()
 
 TMP_DIR = "tmp"
+
+# 起動時にmaster.csvを読み込む
+master = load_master()
 
 @app.post("/upload")
 async def upload_pdfs(files: List[UploadFile] = File(...)):
@@ -30,12 +34,14 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
         amount = extract_amount(text)
         tel = extract_tel(text)
 
+        # 電話番号でmaster.csvと照合して会社名を解決
+        company = find_company_by_tel(tel, master) if tel else None
+
         results.append({
             "original_name": file.filename,
             "date": date,
-            "company": None,  # 次のステップで埋める
+            "company": company,
             "amount": amount,
-            "tel": tel,       # 確認用、master.csv照合後に消す
         })
 
     return results
