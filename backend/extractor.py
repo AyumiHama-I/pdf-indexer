@@ -35,10 +35,8 @@ def extract_amount(text: str) -> str:
             return match.group(1).replace(",", "")
     return None
 
-def extract_tel(text: str) -> str:
-    # ハイフン区切りの電話番号全般に対応
-    pattern = r'(\d{2,4}-\d{2,4}-\d{3,4})'
-    match = re.search(pattern, text)
-    if match:
-        return match.group(1)
-    return None
+def extract_tel(text: str) -> list:
+    # 全ての電話番号をリストで返す
+    pattern = r'\d{2,4}-\d{2,4}-\d{3,4}'
+    return re.findall(pattern, text)
+    # re.findall は「全部見つける」関数です（re.searchは最初の1つだけ）

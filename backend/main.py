@@ -88,11 +88,11 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
         # 抽出したテキストから日付・金額・電話番号を取得
         date = extract_date(text)
         amount = extract_amount(text)
-        tel = extract_tel(text)
+        tel_list = extract_tel(text)
 
         # 電話番号でmaster.csvと照合して会社名を解決
-        company = find_company_by_tel(tel, master) if tel else None
-
+        company = find_company_by_tel(tel_list, master) if tel_list else None
+        
         results.append({
             "original_name": file.filename,
             "date": date,

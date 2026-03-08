@@ -10,9 +10,10 @@ def load_master() -> list:
     with open(MASTER_PATH, encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
-def find_company_by_tel(tel: str, master: list) -> str:
-    # 電話番号でmaster.csvを検索して会社名を返す
-    for row in master:
-        if row["tel"] == tel:
-            return row["name"]
+def find_company_by_tel(tel_list: list, master: list) -> str:
+    # 電話番号リストを順番にmaster.csvと照合
+    for tel in tel_list:
+        for row in master:
+            if row["tel"] == tel:
+                return row["name"]
     return None
