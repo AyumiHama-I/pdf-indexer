@@ -31,24 +31,30 @@ export default function ReviewTable({ pdfItems, onChange, onConfirm }: Props) {
     onChange(newItems)
   }
 
-  const handleConfirm = () => {
-    // 除外していない行にnullが残っていたらエラー
-    const activeItems = pdfItems.filter(item => !item.excluded)
-    const hasNull = activeItems.some(item => !item.date || !item.company || !item.amount)
-    if (hasNull) {
-      alert("未入力の項目があります。赤くなっている箇所を入力してください。")
-      return
-    }
-
-    const confirmed: ConfirmedItem[] = activeItems.map(item => ({
-      original_name: item.original_name,
-      date: item.date!,
-      company: item.company!,
-      amount: item.amount!,
-    }))
-
-    onConfirm(confirmed)
+  const handleConfirm = async () => {
+  const activeItems = pdfItems.filter(item => !item.excluded)
+  const hasNull = activeItems.some(item => !item.date || !item.company || !item.amount)
+  if (hasNull) {
+    alert("未入力の項目があります。赤くなっている箇所を入力してください。")
+    return
   }
+
+  const confirmed: ConfirmedItem[] = activeItems.map(item => ({
+    original_name: item.original_name,
+    date: item.date!,
+    company: item.company!,
+    amount: item.amount!,
+  }))
+
+  // POST /confirm を叩く
+  await fetch("http://localhost:8000/confirm", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(confirmed),
+  })
+
+  onConfirm(confirmed)
+}
 
   return (
     <div>
