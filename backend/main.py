@@ -35,18 +35,20 @@ master = load_master()
 async def download_file(filename: str):
     file_path = os.path.join(TMP_DIR, filename)
     
-    # ファイルが存在するか確認
     if not os.path.exists(file_path):
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="ファイルが見つかりません")
     
-    # BackgroundTaskで「レスポンスを返した後に」tmp/を削除する
-    from starlette.background import BackgroundTask
-    
+    # ZIPとCSV両方ダウンロードされたら削除する
     def cleanup():
-        for f in os.listdir(TMP_DIR):
-            os.remove(os.path.join(TMP_DIR, f))
+        zip_path = os.path.join(TMP_DIR, "result.zip")
+        csv_path = os.path.join(TMP_DIR, "result.csv")
+        # 両方なくなったら全削除
+        if not os.path.exists(zip_path) and not os.path.exists(csv_path):
+            for f in os.listdir(TMP_DIR):
+                os.remove(os.path.join(TMP_DIR, f))
     
+    from starlette.background import BackgroundTask
     return FileResponse(
         file_path,
         filename=filename,
