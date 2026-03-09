@@ -22,17 +22,32 @@ def extract_date(text: str) -> str:
     return None
 
 def extract_amount(text: str) -> str:
-    # 例: ¥110,000, 110,000円, 合計 110,000
-    patterns = [
-        r'[¥￥](\d{1,3}(?:,\d{3})+)',
-        r'(\d{1,3}(?:,\d{3})+)円',
+    # 優先順位1: 「合計金額」「請求合計」「合計」の近くの数字
+    priority_patterns = [
+        r'合計金額[^\d]*(\d{1,3}(?:,\d{3})+)',
+        r'請求合計[^\d]*(\d{1,3}(?:,\d{3})+)',
+        r'項合計[^\d]*(\d{1,3}(?:,\d{3})+)',
         r'合計[^\d]*(\d{1,3}(?:,\d{3})+)',
+        r'合\s*計\s*金\s*額[^\d]*(\d{1,3}(?:,\d{3})+)', 
+        r'合\s*計\s[^\d]*(\d{1,3}(?:,\d{3})+)',
     ]
-    for pattern in patterns:
+    for pattern in priority_patterns:
         match = re.search(pattern, text)
         if match:
-            # カンマを除去して数字だけにする
             return match.group(1).replace(",", "")
+
+    # 優先順位2: ¥・￥の後の数字の中で一番大きいもの
+    yen_pattern = r'[¥￥\\](\d{1,3}(?:,\d{3})+)'
+    yen_matches = re.findall(yen_pattern, text)
+    if yen_matches:
+        return max(yen_matches, key=lambda x: int(x.replace(",", ""))).replace(",", "")
+
+    # 優先順位3: 末尾に「円」がついた数字の中で一番大きいもの
+    en_pattern = r'(\d{1,3}(?:,\d{3})+)円'
+    en_matches = re.findall(en_pattern, text)
+    if en_matches:
+        return max(en_matches, key=lambda x: int(x.replace(",", ""))).replace(",", "")
+
     return None
 
 def extract_tel(text: str) -> list:
