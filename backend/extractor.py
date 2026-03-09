@@ -4,6 +4,7 @@ def extract_date(text: str) -> str:
     # 例: 2026/02/01, 2026-02-01, 2026年02月01日, 令和8年2月1日
     patterns = [
         r'(\d{4})[/\-年](\d{1,2})[/\-月](\d{1,2})',
+        r'(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})',
         r'令和(\d+)年(\d{1,2})月(\d{1,2})日',
     ]
     for pattern in patterns:
@@ -55,6 +56,11 @@ def extract_amount(text: str) -> str:
     en_matches = re.findall(en_pattern, text)
     if en_matches:
         return max(en_matches, key=lambda x: int(x.replace(",", ""))).replace(",", "")
+
+    # 優先順位の最後に追加：テキスト末尾の数字を返す
+    all_amounts = re.findall(r'\d{1,3}(?:,\d{3})+', text)
+    if all_amounts:
+        return all_amounts[-1].replace(",", "")
 
     return None
 
