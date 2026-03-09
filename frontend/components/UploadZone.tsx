@@ -34,7 +34,7 @@ export default function UploadZone({ onUploaded }: Props) {
     const formData = new FormData()
     files.forEach(f => formData.append("files", f))
 
-    const res = await fetch("http://localhost:8000/upload", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload`, {
       method: "POST",
       body: formData,
     })

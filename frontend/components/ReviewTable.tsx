@@ -47,7 +47,7 @@ export default function ReviewTable({ pdfItems, onChange, onConfirm }: Props) {
   }))
 
   // POST /confirm を叩く
-  await fetch("http://localhost:8000/confirm", {
+  await fetch(`${process.env.NEXT_PUBLIC_API_URL}/confirm`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(confirmed),
@@ -84,7 +84,7 @@ export default function ReviewTable({ pdfItems, onChange, onConfirm }: Props) {
         <div style={{ marginTop: "1rem" }}>
           <button onClick={() => setPreviewFile(null)}>✕ 閉じる</button>
           <iframe
-            src={`http://localhost:8000/preview/${encodeURIComponent(previewFile)}`}
+            src={`${process.env.NEXT_PUBLIC_API_URL}/preview/${encodeURIComponent(previewFile)}`}
             width="100%"
             height="600px"
           />
