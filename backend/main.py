@@ -41,6 +41,10 @@ async def download_file(filename: str):
     
     # ZIPとCSV両方ダウンロードされたら削除する
     def cleanup():
+        # ダウンロードしたファイルを削除
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
         zip_path = os.path.join(TMP_DIR, "result.zip")
         csv_path = os.path.join(TMP_DIR, "result.csv")
         # 両方なくなったら全削除
