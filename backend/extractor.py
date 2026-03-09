@@ -22,8 +22,16 @@ def extract_date(text: str) -> str:
     return None
 
 def extract_amount(text: str) -> str:
+    # 税込金額合計は次の行の最大値を取る特別処理
+    match = re.search(r'税込金額合計\n(.*)', text)
+    if match:
+        nums = re.findall(r'\d{1,3}(?:,\d{3})+', match.group(1))
+        if nums:
+            return max(nums, key=lambda x: int(x.replace(",", ""))).replace(",", "")
+
     # 優先順位1: 「合計金額」「請求合計」「合計」の近くの数字
     priority_patterns = [
+        r'税込合計[^\d]*(\d{1,3}(?:,\d{3})+)',
         r'合計金額[^\d]*(\d{1,3}(?:,\d{3})+)',
         r'請求合計[^\d]*(\d{1,3}(?:,\d{3})+)',
         r'項合計[^\d]*(\d{1,3}(?:,\d{3})+)',

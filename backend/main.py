@@ -98,6 +98,7 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
             "date": date,
             "company": company,
             "amount": amount,
+            "extracted_text": text  # 確認用
         })
 
     return results
