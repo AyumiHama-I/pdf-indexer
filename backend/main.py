@@ -61,6 +61,7 @@ async def download_file(filename: str):
         for f in os.listdir(TMP_DIR):
             os.remove(os.path.join(TMP_DIR, f))
             print(f"全削除: {f}")
+        print("tmp/全削除完了")
 
     from starlette.background import BackgroundTask
 
