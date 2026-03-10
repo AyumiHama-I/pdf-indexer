@@ -12,17 +12,19 @@ from builder import build_zip_and_csv
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
+
 class ConfirmedItem(BaseModel):
     original_name: str
     date: str
     company: str
     amount: str
 
+
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-     allow_origins=[
+    allow_origins=[
         "http://localhost:3000",
         "https://pdf-indexer-beta.vercel.app",
     ],
@@ -37,19 +39,21 @@ os.makedirs(TMP_DIR, exist_ok=True)
 # 起動時にmaster.csvを読み込む
 master = load_master()
 
+
 @app.get("/download/{filename}")
 async def download_file(filename: str):
     file_path = os.path.join(TMP_DIR, filename)
-    
+
     if not os.path.exists(file_path):
         from fastapi import HTTPException
+
         raise HTTPException(status_code=404, detail="ファイルが見つかりません")
-    
+
     # ZIPとCSV両方ダウンロードされたら削除する
     def cleanup():
-    if os.path.exists(file_path):
-        os.remove(file_path)
-        print(f"削除: {file_path}")
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            print(f"削除: {file_path}")
 
     zip_path = os.path.join(TMP_DIR, "result.zip")
     csv_path = os.path.join(TMP_DIR, "result.csv")
@@ -57,14 +61,14 @@ async def download_file(filename: str):
         for f in os.listdir(TMP_DIR):
             os.remove(os.path.join(TMP_DIR, f))
             print(f"全削除: {f}")
-    
+
     from starlette.background import BackgroundTask
+
     return FileResponse(
-        file_path,
-        filename=filename,
-        background=BackgroundTask(cleanup)
+        file_path, filename=filename, background=BackgroundTask(cleanup)
     )
-    
+
+
 @app.post("/confirm")
 async def confirm(items: List[ConfirmedItem]):
     confirmed_list = [item.dict() for item in items]
@@ -74,10 +78,12 @@ async def confirm(items: List[ConfirmedItem]):
         "csv_url": "/download/result.csv",
     }
 
+
 @app.get("/preview/{filename}")
 async def preview_pdf(filename: str):
     tmp_path = os.path.join(TMP_DIR, filename)
     return FileResponse(tmp_path, media_type="application/pdf")
+
 
 @app.post("/upload")
 async def upload_pdfs(files: List[UploadFile] = File(...)):
@@ -102,12 +108,14 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
 
         # 電話番号でmaster.csvと照合して会社名を解決
         company = find_company_by_tel(tel_list, master) if tel_list else None
-        
-        results.append({
-            "original_name": file.filename,
-            "date": date,
-            "company": company,
-            "amount": amount,
-        })
+
+        results.append(
+            {
+                "original_name": file.filename,
+                "date": date,
+                "company": company,
+                "amount": amount,
+            }
+        )
 
     return results
