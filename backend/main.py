@@ -47,18 +47,16 @@ async def download_file(filename: str):
     
     # ZIPとCSV両方ダウンロードされたら削除する
     def cleanup():
-        # ダウンロードしたファイルを削除
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            logging.info(f"削除: {file_path}")
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print(f"削除: {file_path}")
 
-        zip_path = os.path.join(TMP_DIR, "result.zip")
-        csv_path = os.path.join(TMP_DIR, "result.csv")
-        # 両方なくなったら全削除
-        if not os.path.exists(zip_path) and not os.path.exists(csv_path):
-            for f in os.listdir(TMP_DIR):
-                os.remove(os.path.join(TMP_DIR, f))
-                logging.info(f"全削除: {f}")
+    zip_path = os.path.join(TMP_DIR, "result.zip")
+    csv_path = os.path.join(TMP_DIR, "result.csv")
+    if not os.path.exists(zip_path) and not os.path.exists(csv_path):
+        for f in os.listdir(TMP_DIR):
+            os.remove(os.path.join(TMP_DIR, f))
+            print(f"全削除: {f}")
     
     from starlette.background import BackgroundTask
     return FileResponse(
