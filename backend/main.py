@@ -3,6 +3,8 @@ from fastapi import FastAPI, UploadFile, File
 from typing import List
 import shutil
 import os
+import logging
+
 from extractor import extract_date, extract_amount, extract_tel
 from matcher import load_master, find_company_by_tel
 from fastapi.responses import FileResponse
@@ -48,6 +50,7 @@ async def download_file(filename: str):
         # ダウンロードしたファイルを削除
         if os.path.exists(file_path):
             os.remove(file_path)
+            logging.info(f"削除: {file_path}")
 
         zip_path = os.path.join(TMP_DIR, "result.zip")
         csv_path = os.path.join(TMP_DIR, "result.csv")
@@ -55,6 +58,7 @@ async def download_file(filename: str):
         if not os.path.exists(zip_path) and not os.path.exists(csv_path):
             for f in os.listdir(TMP_DIR):
                 os.remove(os.path.join(TMP_DIR, f))
+                logging.info(f"全削除: {f}")
     
     from starlette.background import BackgroundTask
     return FileResponse(
