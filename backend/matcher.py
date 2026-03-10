@@ -1,17 +1,17 @@
-import csv
 import os
+import json
 
-MASTER_PATH = os.path.join(os.path.dirname(__file__), "data", "master.csv")
 
 def load_master() -> list:
-    # master.csvを読み込んでリストとして返す
-    if not os.path.exists(MASTER_PATH):
+    # 環境変数からmaster dataを読み込む
+    master_data = os.environ.get("MASTER_DATA")
+    if not master_data:
         return []
-    with open(MASTER_PATH, encoding="utf-8") as f:
-        return list(csv.DictReader(f))
+    return json.loads(master_data)
+
 
 def find_company_by_tel(tel_list: list, master: list) -> str:
-    # 電話番号リストを順番にmaster.csvと照合
+    # 電話番号リストを順番にmasterと照合
     for tel in tel_list:
         for row in master:
             if row["tel"] == tel:
