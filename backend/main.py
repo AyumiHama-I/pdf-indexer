@@ -27,6 +27,7 @@ app.add_middleware(
 
 
 TMP_DIR = "tmp"
+os.makedirs(TMP_DIR, exist_ok=True)
 
 # 起動時にmaster.csvを読み込む
 master = load_master()
@@ -102,7 +103,6 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
             "date": date,
             "company": company,
             "amount": amount,
-            "extracted_text": text  # 確認用
         })
 
     return results
