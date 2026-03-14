@@ -100,7 +100,11 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
         text = ""
         with pdfplumber.open(tmp_path) as pdf:
             for page in pdf.pages:
+            try:
                 text += page.extract_text() or ""
+            except Exception as e:
+                print(f"[WARN] ページの読み取りをスキップしました: {e}")
+                continue  # このページは飛ばして次のページへ
 
         # 抽出したテキストから日付・金額・電話番号を取得
         date = extract_date(text)
