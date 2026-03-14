@@ -27,7 +27,7 @@ export default function ReviewRow({ item, onChange, onPreview }: Props) {
     <tr style={{
       background: item.excluded ? "#f7f7f7" : isIncomplete ? "#fff5f5" : "#fff"
     }}>
-      <td>
+      <td style={{ padding: "8px 12px" }}>
         <button
           onClick={() => onPreview(item.original_name)}
           style={{
@@ -46,7 +46,7 @@ export default function ReviewRow({ item, onChange, onPreview }: Props) {
           確認
         </button>
       </td>
-      <td>
+      <td style={{ padding: "8px 12px 8px 0" }}>
         <input
           value={item.date ?? ""}
           onChange={e => onChange({ ...item, date: e.target.value })}
@@ -57,7 +57,7 @@ export default function ReviewRow({ item, onChange, onPreview }: Props) {
           }}
         />
       </td>
-      <td>
+      <td style={{ padding: "8px 12px 8px 0" }}>
         <input
           value={item.company ?? ""}
           onChange={e => onChange({ ...item, company: e.target.value })}
@@ -68,7 +68,7 @@ export default function ReviewRow({ item, onChange, onPreview }: Props) {
           }}
         />
       </td>
-      <td>
+      <td style={{ padding: "8px 12px 8px 0" }}>
         <input
           value={item.amount ?? ""}
           onChange={e => onChange({ ...item, amount: e.target.value })}
@@ -79,7 +79,7 @@ export default function ReviewRow({ item, onChange, onPreview }: Props) {
           }}
         />
       </td>
-      <td>
+      <td style={{ padding: "8px 0" }}>
         <button
           onClick={() => onChange({ ...item, excluded: !item.excluded })}
           style={{
