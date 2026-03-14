@@ -23,6 +23,15 @@ type Props = {
   onConfirm: (confirmed: ConfirmedItem[]) => void
 }
 
+const thStyle: React.CSSProperties = {
+  padding: "10px 12px",
+  textAlign: "left",
+  fontWeight: 500,
+  fontSize: "12px",
+  color: "#999",
+  borderBottom: "0.5px solid #e5e5e5",
+}
+
 export default function ReviewTable({ pdfItems, onChange, onConfirm }: Props) {
   const [previewFile, setPreviewFile] = useState<string | null>(null);
 
@@ -59,29 +68,53 @@ export default function ReviewTable({ pdfItems, onChange, onConfirm }: Props) {
     onConfirm(confirmed);
   };
 
-  return (
+ return (
     <div>
-      <table border={1} cellPadding={8}>
-        <thead>
-          <tr>
-            <th>PDF確認</th>
-            <th>日付</th>
-            <th>会社名</th>
-            <th>金額</th>
-            <th>除外</th>
-          </tr>
-        </thead>
-        <tbody>
-          {pdfItems.map((item, i) => (
-            <ReviewRow
-              key={item.original_name}
-              item={item}
-              onChange={(updated) => handleChange(updated, i)}
-              onPreview={setPreviewFile}
-            />
-          ))}
-        </tbody>
-      </table>
+      {/* テーブルをカードで囲む */}
+      <div style={{
+        border: "0.5px solid #e5e5e5",
+        borderRadius: "12px",
+        overflow: "hidden",
+        marginBottom: "1.25rem",
+      }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+          <thead>
+            <tr style={{ background: "#fafafa" }}>
+              <th style={thStyle}>PDF確認</th>
+              <th style={thStyle}>日付</th>
+              <th style={thStyle}>会社名</th>
+              <th style={thStyle}>金額</th>
+              <th style={thStyle}>除外</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pdfItems.map((item, i) => (
+              <ReviewRow
+                key={item.original_name}
+                item={item}
+                onChange={updated => handleChange(updated, i)}
+                onPreview={setPreviewFile}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* 件数 + 一括確定ボタン */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ fontSize: "12px", color: "#aaa" }}>
+          {pdfItems.length}件中 {pdfItems.filter(i => !i.excluded).length}件が対象
+        </span>
+        <button
+          onClick={handleConfirm}
+          style={{
+            fontSize: "13px", color: "#fff", background: "#111",
+            border: "none", borderRadius: "8px", padding: "8px 20px", cursor: "pointer",
+          }}
+        >
+          一括確定
+        </button>
+      </div>
 
       {previewFile && (
         <PdfPreviewModal
@@ -89,10 +122,6 @@ export default function ReviewTable({ pdfItems, onChange, onConfirm }: Props) {
           onClose={() => setPreviewFile(null)}
         />
       )}
-
-      <button onClick={handleConfirm} style={{ marginTop: "1rem" }}>
-        一括確定
-      </button>
     </div>
-  );
+  )
 }
