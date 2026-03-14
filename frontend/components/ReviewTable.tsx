@@ -1,5 +1,6 @@
 import ReviewRow from "./ReviewRow"
 import { useState } from "react"
+import PdfPreviewModal from "./PdfPreviewModal"
 
 type PdfItem = {
   original_name: string
@@ -23,38 +24,40 @@ type Props = {
 }
 
 export default function ReviewTable({ pdfItems, onChange, onConfirm }: Props) {
-  const [previewFile, setPreviewFile] = useState<string | null>(null)
+  const [previewFile, setPreviewFile] = useState<string | null>(null);
 
   const handleChange = (updated: PdfItem, index: number) => {
-    const newItems = [...pdfItems]
-    newItems[index] = updated
-    onChange(newItems)
-  }
+    const newItems = [...pdfItems];
+    newItems[index] = updated;
+    onChange(newItems);
+  };
 
   const handleConfirm = async () => {
-  const activeItems = pdfItems.filter(item => !item.excluded)
-  const hasNull = activeItems.some(item => !item.date || !item.company || !item.amount)
-  if (hasNull) {
-    alert("未入力の項目があります。赤くなっている箇所を入力してください。")
-    return
-  }
+    const activeItems = pdfItems.filter((item) => !item.excluded);
+    const hasNull = activeItems.some(
+      (item) => !item.date || !item.company || !item.amount,
+    );
+    if (hasNull) {
+      alert("未入力の項目があります。赤くなっている箇所を入力してください。");
+      return;
+    }
 
-  const confirmed: ConfirmedItem[] = activeItems.map(item => ({
-    original_name: item.original_name,
-    date: item.date!,
-    company: item.company!,
-    amount: item.amount!,
-  }))
+    const confirmed: ConfirmedItem[] = activeItems.map((item) => ({
+      original_name: item.original_name,
+      date: item.date!,
+      company: item.company!,
+      amount: item.amount!,
+    }));
 
-  // POST /confirm を叩く
-  await fetch(`${process.env.NEXT_PUBLIC_API_URL}/confirm`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(confirmed),
-  })
+    // POST /confirm を叩く
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/confirm`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(confirmed),
+    });
 
-  onConfirm(confirmed)
-}
+    onConfirm(confirmed);
+  };
 
   return (
     <div>
@@ -73,7 +76,7 @@ export default function ReviewTable({ pdfItems, onChange, onConfirm }: Props) {
             <ReviewRow
               key={item.original_name}
               item={item}
-              onChange={updated => handleChange(updated, i)}
+              onChange={(updated) => handleChange(updated, i)}
               onPreview={setPreviewFile}
             />
           ))}
@@ -81,19 +84,15 @@ export default function ReviewTable({ pdfItems, onChange, onConfirm }: Props) {
       </table>
 
       {previewFile && (
-        <div style={{ marginTop: "1rem" }}>
-          <button onClick={() => setPreviewFile(null)}>✕ 閉じる</button>
-          <iframe
-            src={`${process.env.NEXT_PUBLIC_API_URL}/preview/${encodeURIComponent(previewFile)}`}
-            width="100%"
-            height="600px"
-          />
-        </div>
+        <PdfPreviewModal
+          filename={previewFile}
+          onClose={() => setPreviewFile(null)}
+        />
       )}
 
       <button onClick={handleConfirm} style={{ marginTop: "1rem" }}>
         一括確定
       </button>
     </div>
-  )
+  );
 }
