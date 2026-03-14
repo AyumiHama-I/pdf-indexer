@@ -88,11 +88,13 @@ export default function ReviewTable({ pdfItems, onChange, onConfirm }: Props) {
           }}
         >
           <thead>
-            <th style={{ ...thStyle, width: "90px" }}>PDF確認</th>
-            <th style={{ ...thStyle, width: "120px" }}>日付</th>
-            <th style={thStyle}>会社名</th> {/* 会社名だけ幅自由に伸ばす */}
-            <th style={{ ...thStyle, width: "110px" }}>金額</th>
-            <th style={{ ...thStyle, width: "60px" }}>除外</th>
+            <tr>
+              <th style={{ ...thStyle, width: "90px" }}>PDF確認</th>
+              <th style={{ ...thStyle, width: "120px" }}>日付</th>
+              <th style={thStyle}>会社名</th>
+              <th style={{ ...thStyle, width: "110px" }}>金額</th>
+              <th style={{ ...thStyle, width: "60px" }}>除外</th>
+            </tr>
           </thead>
           <tbody>
             {pdfItems.map((item, i) => (
