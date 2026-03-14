@@ -27,7 +27,7 @@ export default function Home() {
   return (
     <main style={{
       padding: "2.5rem 2rem",
-      maxWidth: "860px",
+      maxWidth: "1000px",
       margin: "0 auto",
       fontFamily: "sans-serif",
     }}>
