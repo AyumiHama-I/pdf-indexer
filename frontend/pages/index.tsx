@@ -3,7 +3,6 @@ import UploadZone from "../components/UploadZone";
 import ReviewTable from "../components/ReviewTable";
 import DownloadButtons from "../components/DownloadButtons";
 
-// 型定義
 type PdfItem = {
   original_name: string;
   date: string | null;
@@ -26,14 +25,34 @@ export default function Home() {
   const [confirmedItems, setConfirmedItems] = useState<ConfirmedItem[]>([]);
 
   return (
-    <main style={{ padding: "2rem" }}>
-      <h1>PDF索引ファイル命名ツール</h1>
+    <main style={{
+      padding: "2.5rem 2rem",
+      maxWidth: "860px",
+      margin: "0 auto",
+      fontFamily: "sans-serif",
+    }}>
+      {/* タイトル */}
+      <p style={{ fontSize: "13px", color: "#999", marginBottom: "2px" }}>
+        PDF索引ファイル命名ツール
+      </p>
+
+      {/* ステップインジケーター（点3つ） */}
+      <div style={{ display: "flex", gap: "6px", alignItems: "center", marginBottom: "2rem" }}>
+        {[1, 2, 3].map(n => (
+          <div key={n} style={{
+            width: "6px",
+            height: "6px",
+            borderRadius: "50%",
+            background: n === step ? "#111" : n < step ? "#bbb" : "#ddd",
+          }} />
+        ))}
+      </div>
 
       {step === 1 && (
         <UploadZone
           onUploaded={(items, files) => {
             setUploadedFiles(files);
-            setPdfItems(items.map((item) => ({ ...item, excluded: false })));
+            setPdfItems(items.map(item => ({ ...item, excluded: false })));
             setStep(2);
           }}
         />
