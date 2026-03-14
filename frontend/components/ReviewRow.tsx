@@ -51,7 +51,8 @@ export default function ReviewRow({ item, onChange, onPreview }: Props) {
           value={item.date ?? ""}
           onChange={e => onChange({ ...item, date: e.target.value })}
           style={{
-            width: "100%", fontSize: "13px", padding: "5px 8px",
+            width: "calc(100% - 16px)",
+            fontSize: "13px", padding: "5px 8px",
             border: `0.5px solid ${!item.date ? "#e24b4a" : "#ddd"}`,
             borderRadius: "6px", background: "transparent",
           }}
@@ -62,7 +63,8 @@ export default function ReviewRow({ item, onChange, onPreview }: Props) {
           value={item.company ?? ""}
           onChange={e => onChange({ ...item, company: e.target.value })}
           style={{
-            width: "100%", fontSize: "13px", padding: "5px 8px",
+            width: "calc(100% - 16px)",
+            fontSize: "13px", padding: "5px 8px",
             border: `0.5px solid ${!item.company ? "#e24b4a" : "#ddd"}`,
             borderRadius: "6px", background: "transparent",
           }}
@@ -73,7 +75,8 @@ export default function ReviewRow({ item, onChange, onPreview }: Props) {
           value={item.amount ?? ""}
           onChange={e => onChange({ ...item, amount: e.target.value })}
           style={{
-            width: "100%", fontSize: "13px", padding: "5px 8px",
+            width: "calc(100% - 16px)",
+            fontSize: "13px", padding: "5px 8px",
             border: `0.5px solid ${!item.amount ? "#e24b4a" : "#ddd"}`,
             borderRadius: "6px", background: "transparent",
           }}
