@@ -5,6 +5,7 @@ type PdfItem = {
   date: string | null
   company: string | null
   amount: string | null
+  page_count: number
 }
 
 type Props = {

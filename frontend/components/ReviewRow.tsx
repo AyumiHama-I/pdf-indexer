@@ -12,6 +12,7 @@ type PdfItem = {
   company: string | null
   amount: string | null
   excluded: boolean
+  page_count: number 
 }
 
 type Props = {

@@ -9,6 +9,7 @@ type PdfItem = {
   company: string | null;
   amount: string | null;
   excluded: boolean;
+  page_count: number;
 };
 
 type ConfirmedItem = {
@@ -25,34 +26,51 @@ export default function Home() {
   const [confirmedItems, setConfirmedItems] = useState<ConfirmedItem[]>([]);
 
   return (
-    <main style={{
-      padding: "2.5rem 2rem",
-      maxWidth: "1000px",
-      margin: "0 auto",
-      fontFamily: "sans-serif",
-    }}>
+    <main
+      style={{
+        padding: "2.5rem 2rem",
+        maxWidth: "1000px",
+        margin: "0 auto",
+        fontFamily: "sans-serif",
+      }}
+    >
       {/* タイトル */}
       <p style={{ fontSize: "13px", color: "#999", marginBottom: "2px" }}>
         PDF索引ファイル命名ツール
       </p>
 
       {/* ステップインジケーター（点3つ） */}
-      <div style={{ display: "flex", gap: "6px", alignItems: "center", marginBottom: "2rem" }}>
-        {[1, 2, 3].map(n => (
-          <div key={n} style={{
-            width: "6px",
-            height: "6px",
-            borderRadius: "50%",
-            background: n === step ? "#111" : n < step ? "#bbb" : "#ddd",
-          }} />
+      <div
+        style={{
+          display: "flex",
+          gap: "6px",
+          alignItems: "center",
+          marginBottom: "2rem",
+        }}
+      >
+        {[1, 2, 3].map((n) => (
+          <div
+            key={n}
+            style={{
+              width: "6px",
+              height: "6px",
+              borderRadius: "50%",
+              background: n === step ? "#111" : n < step ? "#bbb" : "#ddd",
+            }}
+          />
         ))}
       </div>
 
       {step === 1 && (
         <UploadZone
-          onUploaded={(items, files) => {
-            setUploadedFiles(files);
-            setPdfItems(items.map(item => ({ ...item, excluded: false })));
+          onUploaded={(items, _files) => {
+            setPdfItems(
+              items.map((item) => ({
+                ...item,
+                excluded: false,
+                page_count: item.page_count ?? 1, // ← 追加（念のためデフォルト1）
+              })),
+            );
             setStep(2);
           }}
         />
