@@ -25,14 +25,22 @@ export default function ReviewRow({ item, onChange, onPreview }: Props) {
   const isIncomplete = !item.date || !item.company || !item.amount
 
   return (
-    <tr style={{
-      background: item.excluded ? "#f7f7f7" : isIncomplete ? "#fff5f5" : "#fff"
-    }}>
+    <tr
+      style={{
+        background: item.excluded
+          ? "#f7f7f7"
+          : isIncomplete
+            ? "#fff5f5"
+            : "#fff",
+      }}
+    >
       <td style={{ padding: "8px 12px" }}>
         <button
           onClick={() => onPreview(item.original_name)}
           style={{
-            display: "flex", alignItems: "center", gap: "5px",
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
             fontSize: "12px",
             color: "#555",
             background: "#f5f5f5",
@@ -45,41 +53,61 @@ export default function ReviewRow({ item, onChange, onPreview }: Props) {
         >
           <SearchIcon />
           確認
+          {item.page_count >= 2 && (
+            <span
+              style={{
+                fontSize: "10px",
+                color: "#fff",
+                background: "#e24b4a",
+                borderRadius: "4px",
+                padding: "1px 5px",
+                marginLeft: "2px",
+              }}
+            >
+              {item.page_count}P
+            </span>
+          )}
         </button>
       </td>
       <td style={{ padding: "8px 12px 8px 0" }}>
         <input
           value={item.date ?? ""}
-          onChange={e => onChange({ ...item, date: e.target.value })}
+          onChange={(e) => onChange({ ...item, date: e.target.value })}
           style={{
             width: "calc(100% - 16px)",
-            fontSize: "13px", padding: "5px 8px",
+            fontSize: "13px",
+            padding: "5px 8px",
             border: `0.5px solid ${!item.date ? "#e24b4a" : "#ddd"}`,
-            borderRadius: "6px", background: "transparent",
+            borderRadius: "6px",
+            background: "transparent",
           }}
         />
       </td>
       <td style={{ padding: "8px 12px 8px 0" }}>
         <input
           value={item.company ?? ""}
-          onChange={e => onChange({ ...item, company: e.target.value })}
+          onChange={(e) => onChange({ ...item, company: e.target.value })}
           style={{
             width: "calc(100% - 16px)",
-            fontSize: "13px", padding: "5px 8px",
+            fontSize: "13px",
+            padding: "5px 8px",
             border: `0.5px solid ${!item.company ? "#e24b4a" : "#ddd"}`,
-            borderRadius: "6px", background: "transparent",
+            borderRadius: "6px",
+            background: "transparent",
           }}
         />
       </td>
       <td style={{ padding: "8px 12px 8px 0" }}>
         <input
           value={item.amount ?? ""}
-          onChange={e => onChange({ ...item, amount: e.target.value })}
+          onChange={(e) => onChange({ ...item, amount: e.target.value })}
           style={{
             width: "calc(100% - 16px)",
-            fontSize: "13px", padding: "5px 8px",
+            fontSize: "13px",
+            padding: "5px 8px",
             border: `0.5px solid ${!item.amount ? "#e24b4a" : "#ddd"}`,
-            borderRadius: "6px", background: "transparent",
+            borderRadius: "6px",
+            background: "transparent",
           }}
         />
       </td>
@@ -100,5 +128,5 @@ export default function ReviewRow({ item, onChange, onPreview }: Props) {
         </button>
       </td>
     </tr>
-  )
+  );
 }
