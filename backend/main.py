@@ -1,4 +1,4 @@
-import pdfplumber
+import fitz
 from fastapi import FastAPI, UploadFile, File
 from typing import List
 import shutil
@@ -21,12 +21,6 @@ class ConfirmedItem(BaseModel):
 
 
 app = FastAPI()
-
-# ↓ここに追加
-import PIL
-
-print(f"pdfplumber version: {pdfplumber.__version__}")
-print(f"Pillow version: {PIL.__version__}")
 
 app.add_middleware(
     CORSMiddleware,
@@ -102,21 +96,16 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
         with open(tmp_path, "wb") as f:
             shutil.copyfileobj(file.file, f)
 
-        # pdfplumberでテキスト抽出
+        # pymupdfでテキスト抽出
         text = ""
         page_count = 0
-        with pdfplumber.open(tmp_path) as pdf:
-            page_count = len(pdf.pages)
-            for page in pdf.pages:
-                try:
-                    page_text = page.extract_text() or ""
-                    print(f"=== ページテキスト ===")
-                    print(page_text[:200])
-                    print("====================")
-                    text += page_text
-                except Exception as e:
-                    print(f"[WARN] ページの読み取りをスキップしました: {e}")
-                    continue
+        try:
+            with fitz.open(tmp_path) as pdf:
+                page_count = len(pdf)
+                for page in pdf:
+                    text += page.get_text() or ""
+        except Exception as e:
+            print(f"[WARN] pymupdf読み取りエラー: {e}")
 
         # 抽出したテキストから日付・金額・電話番号を取得
         date = extract_date(text)
