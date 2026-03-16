@@ -3,6 +3,9 @@ import re
 
 def extract_date(text: str) -> str:
     # 優先: キーワードの近くの日付を先に探す
+    print("=== extract_date input ===")
+    print(text[:500])
+    print("=========================")
     priority_keywords = [
         r"伝票日付[：:\s]*(\d{4})[年/\-](\d{1,2})[月/\-](\d{1,2})",
         r"請求日[：:\s]*(\d{4})[年/\-](\d{1,2})[月/\-](\d{1,2})",
