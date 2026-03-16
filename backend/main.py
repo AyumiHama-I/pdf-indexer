@@ -22,6 +22,12 @@ class ConfirmedItem(BaseModel):
 
 app = FastAPI()
 
+# ↓ここに追加
+import PIL
+
+print(f"pdfplumber version: {pdfplumber.__version__}")
+print(f"Pillow version: {PIL.__version__}")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
