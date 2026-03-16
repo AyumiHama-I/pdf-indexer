@@ -5,12 +5,14 @@ def extract_date(text: str) -> str:
     # 優先: 「伝票日付」「請求日」「発行日」「日付」キーワードの近くの日付を先に探す
     print("=== extract_date input ===")
     print(text[:300])
-    # スペースの種類を確認する
-    for i, ch in enumerate(text[:300]):
-        if ch in (" ", "　"):
-            print(
-                f"位置{i}: {'全角' if ch == '　' else '半角'}スペース (前後: '{text[i - 3 : i]}[{ch}]{text[i + 1 : i + 4]}')"
-            )
+    print("=== pattern match test ===")
+    import re
+
+    test_pattern = r"(?<!\d)([1-9]\d{3})[\s　]+(\d{1,2})[\s　]+(\d{1,2})(?!\d)"
+    match = re.search(test_pattern, text)
+    print(f"スペース区切りパターン: {match}")
+    if match:
+        print(f"マッチ内容: {match.groups()}")
     print("=========================")
     priority_keywords = [
         r"伝票日付[：:\s]*(\d{4})[年/\-](\d{1,2})[月/\-](\d{1,2})",
