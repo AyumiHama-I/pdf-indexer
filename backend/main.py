@@ -98,13 +98,15 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
 
         # pdfplumberでテキスト抽出
         text = ""
+        page_count = 0
         with pdfplumber.open(tmp_path) as pdf:
+            page_count = len(pdf.pages)
             for page in pdf.pages:
                 try:
                     text += page.extract_text() or ""
                 except Exception as e:
                     print(f"[WARN] ページの読み取りをスキップしました: {e}")
-                    continue  # このページは飛ばして次のページへ
+                    continue
 
         # 抽出したテキストから日付・金額・電話番号を取得
         date = extract_date(text)
@@ -120,6 +122,7 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
                 "date": date,
                 "company": company,
                 "amount": amount,
+                "page_count": page_count,
             }
         )
 
