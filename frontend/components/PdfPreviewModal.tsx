@@ -1,45 +1,73 @@
-import { useRef, useState, useEffect } from "react"
+import { useRef, useEffect } from "react"
 
 type Props = {
-  filename: string          // 表示するPDFのファイル名
-  onClose: () => void       // ✕ボタンを押したときに呼ばれる関数
+  filename: string
+  onClose: () => void
 }
 
 export default function PdfPreviewModal({ filename, onClose }: Props) {
-  // モーダルの位置（画面左上からの距離）
-  const [pos, setPos] = useState({ x: 80, y: 80 })
+  const modalRef = useRef<HTMLDivElement>(null)
 
-  // ドラッグ中かどうか、ドラッグ開始時のマウス位置とモーダル位置を記憶する
+  // ドラッグ移動の管理
   const dragging = useRef(false)
   const dragOffset = useRef({ x: 0, y: 0 })
 
-  // ヘッダー部分を掴んだとき → ドラッグ開始
-  const handleMouseDown = (e: React.MouseEvent) => {
+  // リサイズの管理
+  const resizing = useRef(false)
+  const resizeStart = useRef({ x: 0, y: 0, w: 0, h: 0 })
+
+  // ヘッダーを掴んだとき → ドラッグ開始
+  const handleDragMouseDown = (e: React.MouseEvent) => {
+    if (!modalRef.current) return
+    const rect = modalRef.current.getBoundingClientRect()
     dragging.current = true
     dragOffset.current = {
-      x: e.clientX - pos.x,  // マウス位置 - モーダル位置 = ずれ
-      y: e.clientY - pos.y,
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    }
+  }
+
+  // 右下の角を掴んだとき → リサイズ開始
+  const handleResizeMouseDown = (e: React.MouseEvent) => {
+    if (!modalRef.current) return
+    e.stopPropagation()  // ドラッグイベントと混在しないように止める
+    const rect = modalRef.current.getBoundingClientRect()
+    resizing.current = true
+    resizeStart.current = {
+      x: e.clientX,
+      y: e.clientY,
+      w: rect.width,
+      h: rect.height,
     }
   }
 
   useEffect(() => {
-    // マウスを動かしているとき → 位置を更新
     const handleMouseMove = (e: MouseEvent) => {
-      if (!dragging.current) return
-      setPos({
-        x: e.clientX - dragOffset.current.x,
-        y: e.clientY - dragOffset.current.y,
-      })
+      if (!modalRef.current) return
+
+      // ドラッグ中: 位置を直接DOMに書き込む（Reactの再描画を経由しないので速い）
+      if (dragging.current) {
+        modalRef.current.style.left = `${e.clientX - dragOffset.current.x}px`
+        modalRef.current.style.top = `${e.clientY - dragOffset.current.y}px`
+      }
+
+      // リサイズ中: サイズを直接DOMに書き込む
+      if (resizing.current) {
+        const newW = resizeStart.current.w + (e.clientX - resizeStart.current.x)
+        const newH = resizeStart.current.h + (e.clientY - resizeStart.current.y)
+        // 最小サイズを設定（小さくなりすぎないように）
+        modalRef.current.style.width = `${Math.max(300, newW)}px`
+        modalRef.current.style.height = `${Math.max(200, newH)}px`
+      }
     }
-    // マウスボタンを離したとき → ドラッグ終了
+
     const handleMouseUp = () => {
       dragging.current = false
+      resizing.current = false
     }
 
     window.addEventListener("mousemove", handleMouseMove)
     window.addEventListener("mouseup", handleMouseUp)
-
-    // コンポーネントが消えるときにイベントを後片付けする
     return () => {
       window.removeEventListener("mousemove", handleMouseMove)
       window.removeEventListener("mouseup", handleMouseUp)
@@ -48,34 +76,35 @@ export default function PdfPreviewModal({ filename, onClose }: Props) {
 
   return (
     <div
+      ref={modalRef}
       style={{
-        position: "fixed",   // 画面にピン留め（スクロールしても動かない）
-        top: pos.y,
-        left: pos.x,
+        position: "fixed",
+        top: "80px",
+        left: "80px",
         width: "600px",
         height: "700px",
         backgroundColor: "white",
-        border: "1px solid #ccc",
+        border: "0.5px solid #ddd",
         borderRadius: "8px",
-        boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
-        zIndex: 1000,        // 他の要素より手前に表示
+        boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+        zIndex: 1000,
         display: "flex",
         flexDirection: "column",
       }}
     >
-      {/* ヘッダー（ここを掴んでドラッグ移動する） */}
+      {/* ヘッダー（ドラッグで移動） */}
       <div
-        onMouseDown={handleMouseDown}
+        onMouseDown={handleDragMouseDown}
         style={{
           padding: "8px 12px",
           backgroundColor: "#f5f5f5",
-          borderBottom: "1px solid #ddd",
+          borderBottom: "0.5px solid #ddd",
           borderRadius: "8px 8px 0 0",
-          cursor: "grab",           // カーソルを「掴む」アイコンに
+          cursor: "grab",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          userSelect: "none",       // ドラッグ中にテキストが選択されないように
+          userSelect: "none",
         }}
       >
         <span style={{ fontSize: "13px", color: "#555" }}>{filename}</span>
@@ -96,8 +125,29 @@ export default function PdfPreviewModal({ filename, onClose }: Props) {
       {/* PDF表示エリア */}
       <iframe
         src={`${process.env.NEXT_PUBLIC_API_URL}/preview/${encodeURIComponent(filename)}`}
-        style={{ flex: 1, border: "none" }}   // flex:1 = 残りの高さを全部使う
+        style={{ flex: 1, border: "none" }}
       />
+
+      {/* リサイズハンドル（右下の角） */}
+      <div
+        onMouseDown={handleResizeMouseDown}
+        style={{
+          position: "absolute",
+          right: "0",
+          bottom: "0",
+          width: "16px",
+          height: "16px",
+          cursor: "nwse-resize",   // 斜め矢印カーソル
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {/* リサイズハンドルの見た目（小さい斜め線） */}
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+          <path d="M9 1L1 9M9 5L5 9M9 9" stroke="#bbb" strokeWidth="1.2" strokeLinecap="round"/>
+        </svg>
+      </div>
     </div>
   )
 }
