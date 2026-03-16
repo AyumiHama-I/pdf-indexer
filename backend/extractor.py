@@ -87,6 +87,13 @@ def extract_amount(text: str) -> str:
 
 
 def extract_tel(text: str) -> list:
-    # 全ての電話番号をリストで返す
-    pattern = r"\d{2,4}-\d{2,4}-\d{3,4}"
-    return re.findall(pattern, text)
+    patterns = [
+        r"\d{2,4}-\d{2,4}-\d{3,4}",  # 06-1234-5678
+        r"\(\d{2,4}\)\d{2,4}-\d{3,4}",  # (06)1234-5678
+        r"\(\d{2,4}\)\s*\d{2,4}-\d{3,4}",  # (06) 1234-5678 スペースあり
+    ]
+    results = []
+    for pattern in patterns:
+        results.extend(re.findall(pattern, text))
+    # 重複を除いて返す
+    return list(dict.fromkeys(results))
