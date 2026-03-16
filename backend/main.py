@@ -103,7 +103,11 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
             page_count = len(pdf.pages)
             for page in pdf.pages:
                 try:
-                    text += page.extract_text() or ""
+                    page_text = page.extract_text() or ""
+                    print(f"=== ページテキスト ===")
+                    print(page_text[:200])
+                    print("====================")
+                    text += page_text
                 except Exception as e:
                     print(f"[WARN] ページの読み取りをスキップしました: {e}")
                     continue
