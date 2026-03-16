@@ -1,4 +1,5 @@
 import fitz
+import pdfplumber
 from fastapi import FastAPI, UploadFile, File
 from typing import List
 import shutil
@@ -96,16 +97,27 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
         with open(tmp_path, "wb") as f:
             shutil.copyfileobj(file.file, f)
 
-        # pymupdfでテキスト抽出
+        # テキスト抽出（pdfplumberで試みて、失敗したらpymupdfで再試行）
         text = ""
         page_count = 0
         try:
-            with fitz.open(tmp_path) as pdf:
-                page_count = len(pdf)
-                for page in pdf:
-                    text += page.get_text() or ""
-        except Exception as e:
-            print(f"[WARN] pymupdf読み取りエラー: {e}")
+            with pdfplumber.open(tmp_path) as pdf:
+                page_count = len(pdf.pages)
+                for page in pdf.pages:
+                    page_text = page.extract_text() or ""
+                    text += page_text
+            # pdfplumberで取れなかった場合pymupdfで再試行
+            if not text.strip():
+                raise ValueError("pdfplumberでテキストが取れなかった")
+        except Exception:
+            print("[INFO] pymupdfで再試行します")
+            try:
+                with fitz.open(tmp_path) as pdf:
+                    page_count = len(pdf)
+                    for page in pdf:
+                        text += page.get_text() or ""
+            except Exception as e:
+                print(f"[WARN] pymupdf読み取りエラー: {e}")
 
         # 抽出したテキストから日付・金額・電話番号を取得
         date = extract_date(text)
