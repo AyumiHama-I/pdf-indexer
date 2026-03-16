@@ -3,17 +3,17 @@ import re
 
 def extract_date(text: str) -> str:
     # 優先: 「伝票日付」「請求日」「発行日」「日付」キーワードの近くの日付を先に探す
-    print("=== extract_date input ===")
-    print(text[:300])
-    print("=== pattern match test ===")
-    import re
-
-    test_pattern = r"(?<!\d)([1-9]\d{3})[\s　]+(\d{1,2})[\s　]+(\d{1,2})(?!\d)"
-    match = re.search(test_pattern, text)
-    print(f"スペース区切りパターン: {match}")
-    if match:
-        print(f"マッチ内容: {match.groups()}")
-    print("=========================")
+    print("=== pattern results ===")
+    patterns_debug = [
+        r"(?<!\d)([1-9]\d{3})\s*[/\-年]\s*(\d{1,2})\s*[/\-月]\s*(\d{1,2})",
+        r"(?<!\d)([1-9]\d{3})\.\s*(\d{1,2})\.\s*(\d{1,2})",
+        r"令和(\d+)年(\d{1,2})月(\d{1,2})日",
+        r"(?<!\d)([1-9]\d{3})[\s　]+(\d{1,2})[\s　]+(\d{1,2})(?!\d)",
+    ]
+    for p in patterns_debug:
+        m = re.search(p, text)
+        print(f"パターン: {p[:30]}... → {m.group() if m else 'なし'}")
+    print("======================")
     priority_keywords = [
         r"伝票日付[：:\s]*(\d{4})[年/\-](\d{1,2})[月/\-](\d{1,2})",
         r"請求日[：:\s]*(\d{4})[年/\-](\d{1,2})[月/\-](\d{1,2})",
